@@ -55,11 +55,16 @@ class csstidy
 						
 	public:
 	    csstidy();
-	    	
+
+	    void parse_css_file(const string& infile);
+
 		// Adds a property-value pair to an existing CSS structure
 		void add(const string& media, const string& selector, const string& property, const string& value);
 	    void copy(const string media, const string selector, const string media_new, const string selector_new);
-	
+
+		// returns a new css with only changed properties
+		// and undefined properties commented out
+		csstidy diff_css(csstidy prev);
 		// Prints CSS code
 		void print_css(string filename = "");
 		

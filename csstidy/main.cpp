@@ -75,6 +75,7 @@ int main(int argc, char *argv[])
 	predefined_templates["low"].push_back("\n"); // after last line @-rule
 	
 	csstidy csst;
+	string diff_filename;
 
 	if(argc > 1)
 	{
@@ -131,24 +132,34 @@ int main(int argc, char *argv[])
 				}
 				output_file = false;
 			}
+			else if(trim(argv[i]).substr(0,7) == "--diff=")
+			{
+				diff_filename = trim(argv[i]).substr(7);
+				if(diff_filename != "-" && !file_exists(diff_filename.c_str()))
+				{
+					cout << "The file \"" << diff_filename << "\" does not exist." << endl;
+					return EXIT_FAILURE;
+				}
+				output_file = false;
+			}
 			if(output_file)
 			{
 				output_filename = trim(argv[i]);
 			}
 		}
 		
-		string css_file;
-        if(filein == "-") {
-			string temp;
-			do {
-				getline(cin, temp, '\n');
-				css_file += (temp + "\n");
-			} while(cin);
-		} else {
-            css_file = file_get_contents(argv[1]);
-        }
+		if(!diff_filename.empty())
+		{
+			csstidy prev = csst;
+			//prev.settings["preserve_css"] = true;
+			csst.parse_css_file(filein);
+			prev.parse_css_file(diff_filename);
 
-		csst.parse_css(css_file);
+			csstidy diff = csst.diff_css(prev);
+			diff.print_css();
+			return EXIT_SUCCESS;
+		}
+		csst.parse_css_file(filein);
 		
 		// Print CSS to screen if no output file is specified
 		if(output_filename == "")

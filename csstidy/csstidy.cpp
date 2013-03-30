@@ -72,6 +72,21 @@ void csstidy::add_token(const token_type ttype, const string data, const bool fo
 	}
 }
 
+void csstidy::parse_css_file(const string& filein)
+{
+	string css_file;
+    if(filein == "-") {
+		string temp;
+		do {
+			getline(cin, temp, '\n');
+			css_file += (temp + "\n");
+		} while(cin);
+	} else {
+        css_file = file_get_contents(filein);
+    }
+	parse_css(css_file);
+}
+
 void csstidy::copy(const string media, const string selector, const string media_new, const string selector_new)
 {
 	for(int k = 0; k < css[media][selector].size(); k++)
